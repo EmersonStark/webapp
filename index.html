@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR" ng-app="listaTelefonica">
+<head>
+	<meta charset="UTF-8">
+	<title>Lista Telefonica</title>
+	<link rel="stylesheet" href="css/vendors/plugins.css">
+	<link rel="stylesheet" href="css/main.css">
+	 <script src="angular.min.js"></script>
+	 <script src="angular-messages.js"></script>
+	 <script>
+	 	//criando modulo
+	 	angular.module("listaTelefonica", ["ngMessages"]);
+
+	 	//Localizar um modulo e definir o controller
+	 	angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function($scope){
+	 		$scope.app = "Lista Telefonica";
+	 		
+	 		$scope.operadoras = [
+	 			{nome:"Oi", codigo:14, categoria:"Celular"},
+	 			{nome:"Vivo", codigo:15, categoria:"Celular"},
+	 			{nome:"Tim", codigo:41, categoria:"Celular"},
+	 			{nome:"GVT", codigo:25, categoria:"Fixo"},
+	 			{nome:"Embratel", codigo:21, categoria:"Fixo"}
+	 		];
+
+	 		$scope.contatos = [
+	 			{nome:"Pedro", telefone:"99998888"},
+	 			{nome:"Ana", telefone:"11111222"},
+	 			{nome:"Maria", telefone:"33331111"}
+	 		];
+
+	 		$scope.adicionarContato = function(contato){
+	 			$scope.contatos.push(angular.copy(contato));
+	 			delete $scope.contato;
+	 			$scope.contatoForm.$setPristine();
+	 		};
+
+	 		//pegar todos que estão selecionados
+	 		$scope.apagarContatos = function(contatos){
+	 			$scope.contatos = contatos.filter(function(contato){
+	 				if (!contato.selecionado) return contato;
+	 			});
+	 			
+	 		};
+
+	 		//aqui ele olha contato a contato se tiver true o some torna true
+	 		$scope.isContatosSelecionado = function(contatos){
+	 			return contatos.some(function(contato){
+	 				return contato.selecionado;
+	 			});
+	 		};
+
+
+
+	 	});
+
+	 </script>
+
+</head>
+<body ng-controller="listaTelefonicaCtrl">
+	
+		
+		<div class="container jumbotron">
+			<h4>{{app}}</h4>
+
+			<table class="table table-striped hover">
+
+				<thead>
+					<tr>
+						<th></th>
+						<th>Nome</th>
+						<th>Telefone</th>
+						<th>Operadora</th>
+					</tr>
+				</thead>
+			  	<tbody>
+
+			  		<tr ng-class="{info: contato.selecionado}" ng-repeat="contato in contatos">
+			  			<td><input type="checkbox" ng-model="contato.selecionado"></td>
+			  			<td>{{contato.nome}}</td>
+			  			<td>{{contato.telefone}}</td>
+			  			<td>{{contato.operadora.nome}}</td>
+			  		</tr>
+			  	</tbody>
+			</table>
+
+			<div ng-messages="contatoForm.nome.$error" class="alert alert-danger" role="alert">
+				<div ng-message="required">
+					Por favor, preencha o campo "Nome"
+				</div>
+				
+			</div>
+
+			<div ng-messages="contatoForm.telefone.$error" class="alert alert-danger">
+				<div ng-message="required">
+					Por favor, preencha o campo "Telefone"
+				</div>
+					
+				<div ng-message="pattern">
+					O campo telefone de ter formado xxxxx-xxxx
+				</div>
+			</div>
+
+			
+
+			<form name="contatoForm">
+				<input type="text" class="form-control" id="nome" placeholder="Nome" name="nome" ng-model="contato.nome" ng-required="true">
+
+			    <input type="text" class="form-control" id="telefone" placeholder="Telefone" name="telefone" ng-model="contato.telefone" ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/">
+
+			    <select class="form-control" ng-model="contato.operadora" ng-options="operadora.nome group by operadora.categoria for operadora in operadoras">
+			    	<option value="">Selecione operadora...</option>
+			    </select>
+
+			  <button class="btn btn-success btn-block" ng-click="adicionarContato(contato)" ng-disabled="!contato.nome || !contato.telefone">Adicionar contato</button>
+
+			  <button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)" ng-if="isContatosSelecionado(contatos)">Apagar contato</button>
+			</form>
+
+	</div>
+
+</body>
+</html>
