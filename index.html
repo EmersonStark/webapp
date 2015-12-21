@@ -6,10 +6,9 @@
 	<link rel="stylesheet" href="css/vendors/plugins.css">
 	<link rel="stylesheet" href="css/main.css">
 	 <script src="angular.min.js"></script>
-	 <script src="angular-messages.js"></script>
 	 <script>
 	 	//criando modulo
-	 	angular.module("listaTelefonica", ["ngMessages"]);
+	 	angular.module("listaTelefonica", []);
 
 	 	//Localizar um modulo e definir o controller
 	 	angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function($scope){
@@ -24,9 +23,9 @@
 	 		];
 
 	 		$scope.contatos = [
-	 			{nome:"Pedro", telefone:"99998888"},
-	 			{nome:"Ana", telefone:"11111222"},
-	 			{nome:"Maria", telefone:"33331111"}
+	 			{nome:"Pedro", telefone:"99998888", data: new Date(), operadora:{nome:"Oi", codigo:14, categoria:"Celular"}},
+	 			{nome:"Ana", telefone:"11111222", data: new Date(), operadora: {nome:"Vivo", codigo:15, categoria:"Celular"}},
+	 			{nome:"Maria", telefone:"33331111", data: new Date(), operadora: {nome:"Tim", codigo:41, categoria:"Celular"}}
 	 		];
 
 	 		$scope.adicionarContato = function(contato){
@@ -50,6 +49,10 @@
 	 			});
 	 		};
 
+	 		$scope.ordenarPor = function(campo){
+	 			$scope.buscaOrdenacao = campo;
+	 			$scope.buscaDirecaoaOrdenacao = !$scope.buscaOrdenacao;
+	 		};
 
 
 	 	});
@@ -63,35 +66,45 @@
 		<div class="container jumbotron">
 			<h4>{{app}}</h4>
 
+			<input type="text" class="form-control" ng-model="busca" placeholder="O que você esta buscando?">
+
 			<table class="table table-striped hover">
 
 				<thead>
 					<tr>
 						<th></th>
-						<th>Nome</th>
-						<th>Telefone</th>
+						<th><a href="" ng-click="ordenarPor('nome')">Nome</a></th>
+						<th><a href="" ng-click="ordenarPor('telefone')">Telefone</a></th>
 						<th>Operadora</th>
+						<th>Data</th>
 					</tr>
 				</thead>
 			  	<tbody>
 
-			  		<tr ng-class="{info: contato.selecionado}" ng-repeat="contato in contatos">
+			  		<tr ng-class="{info: contato.selecionado}" ng-repeat="contato in contatos | filter:{nome: busca} | orderBy: buscaOrdenacao:buscaDirecaoaOrdenacao">
 			  			<td><input type="checkbox" ng-model="contato.selecionado"></td>
 			  			<td>{{contato.nome}}</td>
 			  			<td>{{contato.telefone}}</td>
-			  			<td>{{contato.operadora.nome}}</td>
+			  			<td>{{contato.operadora.nome | lowercase}}</td>
+			  			<td>{{contato.data | date: 'dd/mm/yyyy HH:mm'}}</td>
 			  		</tr>
 			  	</tbody>
 			</table>
 
-			<div ng-messages="contatoForm.nome.$error" class="alert alert-danger" role="alert">
+			<div class="alert alert-danger" ng-show="contatoForm.nome.$error.required && contatoForm.nome.$dirty">Por favor, preencha o campo "Nome"</div>
+
+			<div class="alert alert-danger" ng-show="contatoForm.telefone.$error.required && contatoForm.telefone.$dirty">Por favor, preencha o campo "Telefone"</div>
+
+			<div class="alert alert-danger" ng-show="contatoForm.telefone.$error.pattern">O campo telefone de ter formado xxxxx-xxxx</div>
+
+			<!-- <div ng-messages="contatoForm.nome.$error" class="alert alert-danger" role="alert">
 				<div ng-message="required">
 					Por favor, preencha o campo "Nome"
 				</div>
 				
-			</div>
+			</div> -->
 
-			<div ng-messages="contatoForm.telefone.$error" class="alert alert-danger">
+			<!-- <div ng-messages="contatoForm.telefone.$error" class="alert alert-danger">
 				<div ng-message="required">
 					Por favor, preencha o campo "Telefone"
 				</div>
@@ -99,9 +112,7 @@
 				<div ng-message="pattern">
 					O campo telefone de ter formado xxxxx-xxxx
 				</div>
-			</div>
-
-			
+			</div> -->
 
 			<form name="contatoForm">
 				<input type="text" class="form-control" id="nome" placeholder="Nome" name="nome" ng-model="contato.nome" ng-required="true">
