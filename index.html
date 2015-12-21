@@ -51,7 +51,10 @@
 
 	 		$scope.ordenarPor = function(campo){
 	 			$scope.buscaOrdenacao = campo;
-	 			$scope.buscaDirecaoaOrdenacao = !$scope.buscaOrdenacao;
+	 			// Linha errada essa abaixo
+	 			//$scope.buscaDirecaoaOrdenacao = !$scope.buscaOrdenacao;
+	 			// Linha correta abaixo: 
+	 			$scope.buscaDirecaoaOrdenacao = !$scope.buscaDirecaoaOrdenacao;
 	 		};
 
 
